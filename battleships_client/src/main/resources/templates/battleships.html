@@ -1,0 +1,99 @@
+<!-- battleship.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Battleship Game</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* Style pour les boutons carrés bleus */
+        table {
+            border-collapse: collapse;
+        }
+
+        td{
+            padding: 4px;
+            background-color: black;
+        }
+
+        button {
+            width: 50px;
+            height: 50px;
+            background-color: #008B8B;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        table {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h2, p {
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+        }
+
+        #history{
+            padding-left: 30px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Battleship Game</h2>
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <table>
+        <tr th:each="row, rowStat : ${grid}">
+            <td th:each="cell, colStat : ${row}" th:attr="data-x=${rowStat.index}, data-y=${colStat.index}">
+                <form th:action="@{/game/fire}" th:method="post">
+                    <input type="hidden" th:name="x" th:value="${rowStat.index}" />
+                    <input type="hidden" th:name="y" th:value="${colStat.index}" />
+                    <button type="submit" th:text="'Cell ' + ${rowStat.index} + ${colStat.index}" />
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    </table>
+
+    <div id="history" >
+        <h3>History</h3>
+        <ul>
+            <li th:each="history : ${historyList}" th:utext="${'Tile: <strong>' + history.x + '' + history.y + '</strong> - Is the ship hit? <strong>' + history.tileHit + '</strong> --- Is ship sunk? <strong>' + history.shipSunk + '</strong>'}" />        </ul>
+    </div>
+</div>
+<p th:text="${'Number of shots fired: ' + historyList.size()}" style="margin: 30px; font-size: 24px;"></p>
+</body>
+<script th:inline="javascript">
+    function updateTileColors() {
+        var historyList = /*[[${historyList}]]*/;
+
+        historyList.forEach(function(history) {
+            var x = history.x;
+            var y = history.y;
+
+            var tile = document.querySelector('td[data-x="' + x + '"][data-y="' + y + '"]');
+
+            if (history.tileHit) {
+                tile.style.backgroundColor = '#00FF00'; // Red if hit
+            } else {
+                tile.style.backgroundColor = '#FF0000'; // Green if not hit
+            }
+        });
+    }
+    window.onload = updateTileColors;
+</script>
+</html>
